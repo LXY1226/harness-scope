@@ -6,22 +6,24 @@
 
 ## 环境
 
-- Node.js 22.12+ 与 npm；CI 使用 Node.js 22。
+- Node.js 22.12+ 与 pnpm 11；CI 使用 Node.js 22。
 - Rust stable、Cargo；格式和静态检查需要 rustfmt、Clippy。
 - 对应平台的 [Tauri 开发依赖](https://v2.tauri.app/start/prerequisites/)。Windows 需要 MSVC 构建工具和 WebView2。
 - Python 3 用于合成演示、对账和部署辅助脚本。
 
 ```powershell
-npm ci
-npm run version:check
+pnpm install
+ppnpm run version:check
 ```
+
+pnpm 11 默认不执行依赖的安装脚本，仓库在 `pnpm-workspace.yaml` 中用 `allowBuilds` 放行 `esbuild`。移除该配置会让 `pnpm run` 因存在未批准的构建脚本而失败。
 
 Rust 依赖使用仓库中的 `Cargo.lock`。下列构建命令传入 `--locked`，避免构建时更新锁文件。
 
 ## 桌面开发
 
 ```powershell
-npm run desktop
+pnpm run desktop
 ```
 
 Tauri 会启动 Vite，并通过 Rust 命令访问本机数据，不需要额外启动 HTTP 服务。默认窗口为 1000×667 逻辑像素，最小为 900×620；配置见 [tauri.conf.json](../src-tauri/tauri.conf.json)。
@@ -34,10 +36,10 @@ Tauri 会启动 Vite，并通过 Rust 命令访问本机数据，不需要额外
 
 ```powershell
 # 优化构建，内嵌前端
-npm run desktop:build -- -- --locked
+pnpm run desktop:build -- -- --locked
 
 # 需要调试符号时使用
-npm run tauri -- build --debug --no-bundle -- --locked
+pnpm run tauri -- build --debug --no-bundle -- --locked
 ```
 
 | 构建 | 输出 |
@@ -60,19 +62,19 @@ cargo run --locked -p harness-scope-service -- --local --db output/playwright/de
 另开终端：
 
 ```powershell
-npm run dev
+pnpm run dev
 ```
 
 打开 `http://127.0.0.1:1420`。初始演示来源为仓库中的 Claude／Codex 合成样本，关闭 models.dev 自动导入，未配置同步服务器。测试真实来源时另建数据库，不复用正式桌面库。
 
 ## 版本与构建标识
 
-应用版本的唯一编辑入口是根 [Cargo.toml](../Cargo.toml) 的 `[workspace.package].version`。Rust 工作区包继承此值；修改后同步 npm、Tauri 和锁文件：
+应用版本的唯一编辑入口是根 [Cargo.toml](../Cargo.toml) 的 `[workspace.package].version`。Rust 工作区包继承此值；修改后同步 `package.json`、Tauri 配置和 `Cargo.lock`：
 
 ```powershell
-npm run version:sync
-npm run version:check
-npm run test:version
+pnpm run version:sync
+pnpm run version:check
+pnpm run test:version
 ```
 
 前端构建、Rust 构建和 CI 检查版本一致性。功能增加通常提升次版本，修复提升补丁版本。应用版本、数据库 schema 和同步协议独立演进，当前数据契约见[架构说明](ARCHITECTURE.md#版本与兼容)。

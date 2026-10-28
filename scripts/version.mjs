@@ -14,13 +14,12 @@ export function readVersion(root = ROOT) {
 export function versions(root = ROOT, sync = false) {
   const version = readVersion(root);
   const errors = [];
-  for (const file of ['package.json', 'package-lock.json', 'src-tauri/tauri.conf.json']) {
+  for (const file of ['package.json', 'src-tauri/tauri.conf.json']) {
     const path = resolve(root, file);
     const value = JSON.parse(readFileSync(path, 'utf8'));
-    if (value.version !== version || (file === 'package-lock.json' && value.packages[''].version !== version)) errors.push(file);
+    if (value.version !== version) errors.push(file);
     if (sync) {
       value.version = version;
-      if (file === 'package-lock.json') value.packages[''].version = version;
       writeFileSync(path, JSON.stringify(value, null, 2) + '\n');
     }
   }
@@ -33,7 +32,7 @@ export function versions(root = ROOT, sync = false) {
     return block.replace(/^version = "[^"]+"/m, `version = "${version}"`);
   }).join('[[package]]');
   if (sync) writeFileSync(lockPath, updated);
-  if (!sync && errors.length) throw new Error(`Version mismatch: ${errors.join(', ')}. Run npm run version:sync.`);
+  if (!sync && errors.length) throw new Error(`Version mismatch: ${errors.join(', ')}. Run pnpm run version:sync.`);
   return version;
 }
 function git(args, root) {

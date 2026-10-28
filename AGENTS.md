@@ -5,7 +5,7 @@
 ## 按变更范围执行验证
 
 - 开始前检查 `git status`、相关文档、运行中的应用/构建进程以及已有产物。复用匹配当前代码的工具和依赖，不为每次验证复制运行时或安装一套 `node_modules`。
-- 纯文档修改检查内容、链接和 diff，不重建应用。仅前端修改优先执行 `npm run typecheck`、受影响的 Vitest 文件以及必要的界面检查，不默认运行整个 Rust 测试集。
+- 纯文档修改检查内容、链接和 diff，不重建应用。仅前端修改优先执行 `pnpm run typecheck`、受影响的 Vitest 文件以及必要的界面检查，不默认运行整个 Rust 测试集。
 - Rust 单元测试必须限定 package 和 `--lib`，例如 `cargo test --locked -p harness-scope-core --lib icons::tests`。仅传测试名称过滤器不会限制需要构建的测试目标。
 - 集成测试使用 `--test <目标名>`，例如 `cargo test --locked -p harness-scope-core --test applications`。需要检查示例或二进制时明确指定目标。
 - 涉及公共接口、数据库迁移、同步、广泛依赖变化或发布验收时，按影响范围扩展到完整检查；不能为了省空间省略必要验证。完整命令见 `docs/VALIDATION.md`，不应对每次小修改机械执行全部命令。
@@ -16,7 +16,7 @@
 - 日常自动验证不需要调试器时，在执行 Cargo 的子进程内统一设置 `CARGO_PROFILE_DEV_DEBUG=0`、`CARGO_PROFILE_TEST_DEBUG=0`、`CARGO_INCREMENTAL=0`，减少 PDB 和增量缓存。需要断点或完整符号时可临时启用，并在验证后清理对应产物。
 - 环境覆盖只作用于本次命令或专用子进程，不修改用户/系统环境。一次验证保持相同的 profile、features 和 package 范围，避免无必要地切换参数生成多套依赖与测试产物。
 - 默认复用仓库的 `target/`。确需隔离构建时，记录临时 `CARGO_TARGET_DIR` 的绝对路径，并在任务结束前清理；禁止通过把缓存搬到其他目录来隐藏占用。
-- 用户要求 Windows 应用时默认使用 release：`npm run desktop:build -- -- --locked`。该命令已包含前端构建，无新修改时不要紧接着重复 `npm run build`。
+- 用户要求 Windows 应用时默认使用 release：`pnpm run desktop:build -- -- --locked`。该命令已包含前端构建，无新修改时不要紧接着重复 `pnpm run build`。
 - 更新应用前确认正在运行的可执行文件路径，只停止当前仓库对应的应用。需要回滚时保留最近一份必要的旧程序，验证新程序后清理更早副本，避免每次重启都永久增加一份 EXE。
 - `target/` 的常态体积目标为 8 GiB 以内。超过时先定位 debug、PDB、incremental、重复构建及测试产物；这是检查阈值，不是跳过必要测试的理由。
 

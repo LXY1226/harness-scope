@@ -10,8 +10,8 @@ test('sync updates application manifests and local crates without changing depen
   t.after(() => rmSync(root, { recursive: true, force: true }));
   mkdirSync(join(root, 'src-tauri'));
   writeFileSync(join(root, 'Cargo.toml'), '[workspace.package]\nversion = "0.2.0"\n');
-  for (const file of ['package.json', 'package-lock.json', 'src-tauri/tauri.conf.json']) {
-    writeFileSync(join(root, file), JSON.stringify({ version: '0.1.0', packages: { '': { version: '0.1.0' }, example: { version: '3.2.1' } } }));
+  for (const file of ['package.json', 'src-tauri/tauri.conf.json']) {
+    writeFileSync(join(root, file), JSON.stringify({ version: '0.1.0', dependencies: { example: { version: '3.2.1' } } }));
   }
   const external = '\nname = "external"\nversion = "3.2.1"\n';
   writeFileSync(join(root, 'Cargo.lock'), ['harness-scope-core', 'harness-scope-service', 'harness-scope-desktop'].map(name => `[[package]]\nname = "${name}"\nversion = "0.1.0"\n`).join('') + '[[package]]' + external);
@@ -19,7 +19,8 @@ test('sync updates application manifests and local crates without changing depen
   assert.equal(versions(root, true), '0.2.0');
   assert.equal(versions(root), '0.2.0');
   assert.ok(readFileSync(join(root, 'Cargo.lock'), 'utf8').endsWith(external));
-  assert.equal(JSON.parse(readFileSync(join(root, 'package-lock.json'))).packages.example.version, '3.2.1');
+  assert.equal(JSON.parse(readFileSync(join(root, 'package.json'))).dependencies.example.version, '3.2.1');
+  assert.equal(JSON.parse(readFileSync(join(root, 'src-tauri/tauri.conf.json'))).version, '0.2.0');
   const before = readFileSync(join(root, 'Cargo.lock'), 'utf8');
   versions(root, true);
   assert.equal(readFileSync(join(root, 'Cargo.lock'), 'utf8'), before);

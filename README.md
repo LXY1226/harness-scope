@@ -30,11 +30,11 @@ Copilot 的完整 Credits／PRU 计量、Agent Host 和 CLI 导入仍未实现�
 
 目前提供源码运行与本机可执行文件构建，安装器、签名和自动更新尚未配置。
 
-准备 Node.js 22.12+、Rust 和对应平台的 [Tauri 开发依赖](https://v2.tauri.app/start/prerequisites/)，在仓库根目录执行：
+准备 Node.js 22.12+、pnpm 11、Rust 和对应平台的 [Tauri 开发依赖](https://v2.tauri.app/start/prerequisites/)，在仓库根目录执行：
 
 ```powershell
-npm ci
-npm run desktop
+pnpm install
+pnpm run desktop
 ```
 
 启动后在「应用」页检查数据来源目录，在「用量」和「会话」页查看结果。供应商账号与多设备同步按需配置。

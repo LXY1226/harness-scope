@@ -18,7 +18,6 @@ fn main() {
         "Cargo.toml",
         "Cargo.lock",
         "package.json",
-        "package-lock.json",
         "src",
         "src-tauri",
         "crates",
@@ -37,24 +36,14 @@ fn main() {
         }
     }
     let version = env::var("CARGO_PKG_VERSION").unwrap();
-    for file in [
-        "package.json",
-        "package-lock.json",
-        "src-tauri/tauri.conf.json",
-    ] {
+    for file in ["package.json", "src-tauri/tauri.conf.json"] {
         let value: serde_json::Value =
             serde_json::from_slice(&fs::read(root.join(file)).unwrap()).unwrap();
         assert_eq!(
             value["version"].as_str(),
             Some(version.as_str()),
-            "Version mismatch in {file}; run npm run version:sync"
+            "Version mismatch in {file}; run pnpm run version:sync"
         );
-        if file == "package-lock.json" {
-            assert_eq!(
-                value["packages"][""]["version"].as_str(),
-                Some(version.as_str())
-            );
-        }
     }
     let commit = git(&root, &["rev-parse", "HEAD"]);
     let dirty = git(
