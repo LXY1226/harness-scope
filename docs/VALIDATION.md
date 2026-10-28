@@ -9,12 +9,12 @@
 以下是与 [CI 工作流](../.github/workflows/ci.yml) 对齐的完整检查，在仓库根目录运行。日常局部修改按根目录 [AGENTS.md](../AGENTS.md) 选择受影响的目标，避免每次重复完整构建；验证完成后及时将不再需要的中间产物移入回收站。
 
 ```powershell
-npm ci
-npm run version:check
-npm run test:version
-npm test
+pnpm install
+pnpm run version:check
+pnpm run test:version
+pnpm test
 python -m unittest discover -s scripts -p "test_*.py"
-npm run build
+pnpm run build
 cargo fmt --all --check
 cargo test --workspace --locked
 cargo clippy --workspace --all-targets --locked -- -D warnings
